@@ -1,7 +1,6 @@
 "use client";
 
 import { login } from "@/actions/auth";
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useActionState } from "react";
 
@@ -27,8 +26,14 @@ const LoginPage = () => {
         <div className="p-0 min-[576px]:pt-[40px] pr-0 min-[576px]:pb-[120px] min-[576px]:pl-[60px] w-full min-[576px]:pr-[60px] min-[768px]:pr-0 min-[768px]:w-[85%] h-auto min-[1440px]:pl-[120px]">
           <div className="relative h-full">
             <div className="flex items-center h-auto relative z-10">
-              <div className="w-auto">
-                <img src="/login/logo.png" alt="logo" className="w-full" />
+              <div className="w-auto relative">
+                <Image
+                  width={26}
+                  height={51}
+                  src="/login/logo.png"
+                  alt="logo"
+                  className="w-[26px] h-[51px]"
+                />
               </div>
               <div className="text-[37px] text-white font-bold ml-[8px]">
                 Trimba

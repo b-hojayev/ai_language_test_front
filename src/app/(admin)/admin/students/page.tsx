@@ -1,13 +1,11 @@
-import { getGroups } from "@/actions/admin/groups/getGroups";
 import { getSpecialities } from "@/actions/admin/specialities/getSpecialities";
 import { getStudents } from "@/actions/admin/students/getStudents";
 import StudentList from "@/components/admin/students/StudentList";
 import { AlertCircle } from "lucide-react";
 
 const AdminStudentsPage = async () => {
-  const students = await getStudents();
+  const students = await getStudents(1);
   const specialities = await getSpecialities();
-  const groups = await getGroups();
 
   if (students.error) {
     return (
@@ -18,13 +16,7 @@ const AdminStudentsPage = async () => {
     );
   }
 
-  return (
-    <StudentList
-      students={students}
-      specialities={specialities}
-      groups={groups}
-    />
-  );
+  return <StudentList initialStudents={students} specialities={specialities} />;
 };
 
 export default AdminStudentsPage;

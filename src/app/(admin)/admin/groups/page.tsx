@@ -5,7 +5,7 @@ import { AlertCircle } from "lucide-react";
 
 const GroupPage = async () => {
   const specialities = await getSpecialities();
-  const groups = await getGroups();
+  const groups = await getGroups(1);
 
   console.log("specs:", specialities);
   console.log("groups:", groups);
@@ -20,7 +20,7 @@ const GroupPage = async () => {
     );
   }
 
-  return <GroupList groups={groups} specialities={specialities} />;
+  return <GroupList initialGroups={groups} specialities={specialities} />;
 };
 
 export default GroupPage;

@@ -1,8 +1,10 @@
 "use client";
 
+import { getAllResults } from "@/actions/admin/results/getAllResults";
 import { searchResult } from "@/actions/admin/results/searchResult";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 type SubmissionData = {
   id: string;
@@ -18,12 +20,39 @@ type SubmissionData = {
   };
 };
 
+const FETCH_LIMIT = 25;
+
 const ResultList = ({ submissions }: { submissions: SubmissionData[] }) => {
+  const { ref, inView } = useInView();
+  const page = useRef<number>(1);
+  const [isLastPage, setIsLastPage] = useState<boolean>(false);
+
+  const [results, setResults] = useState(submissions);
+
   const [query, setQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [results, setResults] = useState(submissions);
   console.log(query);
+
+  useEffect(() => {
+    if (inView && !isLastPage) {
+      page.current += 1;
+      fetchResults(page.current);
+    }
+  }, [inView]);
+
+  const fetchResults = async (page: number) => {
+    const response = await getAllResults(page);
+
+    if (response.error) {
+      setError(response.error);
+    } else {
+      if (response.length < FETCH_LIMIT) {
+        setIsLastPage(true);
+      }
+      setResults((prev) => [...prev, ...response]);
+    }
+  };
 
   useEffect(() => {
     const searchSubmissions = async () => {
@@ -72,6 +101,12 @@ const ResultList = ({ submissions }: { submissions: SubmissionData[] }) => {
           <p>no submissions with this query: {query}</p>
         )}
       </div>
+
+      {!isLastPage && (
+        <div ref={ref} className="w-full flex items-center justify-center mt-5">
+          <div className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
     </div>
   );
 };

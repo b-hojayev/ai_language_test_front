@@ -2,8 +2,8 @@
 
 import { cookies } from "next/headers";
 
-export const getAllResults = async (page: number) => {
-  const url = `${process.env.NEXT_PUBLIC_API_HOST}/admin/results?page=${page}`;
+export const getGroupsBySpeciality = async (specialityId: string) => {
+  const url = `${process.env.NEXT_PUBLIC_API_HOST}/admin/groups/speciality/${specialityId}`;
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 

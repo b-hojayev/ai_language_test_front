@@ -1,9 +1,11 @@
+"use server";
+
 import { cookies } from "next/headers";
 
-export const getStudents = async () => {
+export const getStudents = async (page: number) => {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-  const url = `${process.env.NEXT_PUBLIC_API_HOST}/admin/students`;
+  const url = `${process.env.NEXT_PUBLIC_API_HOST}/admin/students?page=${page}`;
 
   try {
     const response = await fetch(url, {

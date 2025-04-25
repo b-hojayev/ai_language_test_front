@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Pencil, Plus, Trash } from "lucide-react";
 import { Input } from "../../ui/input";
-import { FormEvent, useActionState, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Speciality } from "../specialities/Specialities";
 import {
   Dialog,
@@ -37,6 +37,9 @@ import { Group } from "../groups/GroupList";
 import { deleteStudent } from "@/actions/admin/students/deleteStudents";
 import { toast } from "sonner";
 import { updateStudent } from "@/actions/admin/students/updateStudent";
+import { getGroupsBySpeciality } from "@/actions/admin/groups/getGroupsBySpeciality";
+import { useInView } from "react-intersection-observer";
+import { getStudents } from "@/actions/admin/students/getStudents";
 
 interface Student {
   id: string;
@@ -68,21 +71,49 @@ const initialValues = {
   password: "",
 };
 
+const FETCH_LIMIT = 25;
+
 export default function StudentList({
-  students,
+  initialStudents,
   specialities,
-  groups,
 }: {
-  students: Student[];
+  initialStudents: Student[];
   specialities: Speciality[];
-  groups: Group[];
 }) {
+  const { ref, inView } = useInView();
+  const page = useRef<number>(1);
+  const [isLastPage, setIsLastPage] = useState<boolean>(false);
+
+  const [students, setStudents] = useState<Student[]>(initialStudents);
+
   const [newStudentValues, setNewStudentValues] = useState(initialValues);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCreateModal, setIsCreateModal] = useState<boolean>(false);
   const [isUpdateModal, setIsUpdateModal] = useState<boolean>(false);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [groupError, setGroupError] = useState("");
+
+  useEffect(() => {
+    if (inView && !isLastPage) {
+      page.current += 1;
+      fetchStudents(page.current);
+    }
+  }, [inView]);
+
+  const fetchStudents = async (page: number) => {
+    const response = await getStudents(page);
+
+    if (response.error) {
+      setError(response.error);
+    } else {
+      if (response.length < FETCH_LIMIT) {
+        setIsLastPage(true);
+      }
+      setStudents((prev) => [...prev, ...response]);
+    }
+  };
 
   const handleDelete = async (studentId: string) => {
     const isError = await deleteStudent(studentId);
@@ -91,6 +122,10 @@ export default function StudentList({
       toast.error("Error", {
         description: isError,
         closeButton: true,
+      });
+    } else {
+      setStudents((prev) => {
+        return prev.filter((val) => val.id !== studentId);
       });
     }
   };
@@ -104,8 +139,9 @@ export default function StudentList({
     if (isError) {
       setError(isError);
     } else {
-      setIsCreateModal(false);
-      setNewStudentValues(initialValues);
+      window.location.href = "/admin/students";
+      // setIsCreateModal(false);
+      // setNewStudentValues(initialValues);
     }
 
     setIsLoading(false);
@@ -253,12 +289,20 @@ export default function StudentList({
               <Select
                 name="specialityId"
                 value={newStudentValues.specialityId}
-                onValueChange={(value) =>
+                onValueChange={async (value) => {
                   setNewStudentValues((prev) => ({
                     ...prev,
                     specialityId: value,
-                  }))
-                }
+                  }));
+
+                  const groups = await getGroupsBySpeciality(value);
+
+                  if (!groups.error) {
+                    setGroups(groups);
+                  } else {
+                    setGroupError(groups.error);
+                  }
+                }}
               >
                 <SelectTrigger
                   id="speciality"
@@ -286,6 +330,8 @@ export default function StudentList({
                   </SelectGroup>
                 </SelectContent>
               </Select>
+
+              {groupError && <div>{groupError}</div>}
 
               <Label htmlFor="group">Groups</Label>
               <Select
@@ -366,7 +412,7 @@ export default function StudentList({
                   <TableCell>{student.group.number}</TableCell>
                   <TableCell className="flex gap-2">
                     <Button
-                      onClick={() => {
+                      onClick={async () => {
                         setIsUpdateModal(true);
                         setSelectedStudentId(student.id);
                         setNewStudentValues({
@@ -378,6 +424,15 @@ export default function StudentList({
                           password: "",
                           specialityId: student.speciality.id,
                         });
+                        const groups = await getGroupsBySpeciality(
+                          student.speciality.id
+                        );
+
+                        if (!groups.error) {
+                          setGroups(groups);
+                        } else {
+                          setGroupError(groups.error);
+                        }
                       }}
                       variant="outline"
                       size="icon"
@@ -397,6 +452,14 @@ export default function StudentList({
               ))}
             </TableBody>
           </Table>
+          {!isLastPage && (
+            <div
+              ref={ref}
+              className="w-full flex items-center justify-center mt-5"
+            >
+              <div className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -521,12 +584,20 @@ export default function StudentList({
               <Select
                 name="specialityId"
                 value={newStudentValues.specialityId}
-                onValueChange={(value) =>
+                onValueChange={async (value) => {
                   setNewStudentValues((prev) => ({
                     ...prev,
                     specialityId: value,
-                  }))
-                }
+                  }));
+
+                  const groups = await getGroupsBySpeciality(value);
+
+                  if (!groups.error) {
+                    setGroups(groups);
+                  } else {
+                    setGroupError(groups.error);
+                  }
+                }}
               >
                 <SelectTrigger
                   id="speciality"

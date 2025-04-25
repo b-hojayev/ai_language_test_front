@@ -455,7 +455,7 @@ export default function QuizEditor({
                 Answer Options
               </label>
 
-              {test.answerVariants.map((answer, i) => (
+              {test.answerVariants.map((answer) => (
                 <div
                   key={answer.id}
                   className="flex items-center mb-2 p-2 bg-white rounded border"

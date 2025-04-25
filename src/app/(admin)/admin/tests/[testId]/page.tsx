@@ -1,7 +1,7 @@
 import { getBooks } from "@/actions/admin/books/getBooks";
 import { getSingleTest } from "@/actions/admin/tests/getSingleTest";
 import QuizEditor from "@/components/admin/tests/QuizEditor";
-import { msToMinutes, msToTime } from "@/lib/utils";
+import { msToMinutes } from "@/lib/utils";
 
 const TestEditPage = async ({
   params,

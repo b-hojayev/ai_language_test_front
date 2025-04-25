@@ -27,7 +27,7 @@ export const createStudent = async (body: {
     });
 
     if (response.ok) {
-      revalidatePath("/admin/students");
+      // revalidatePath("/admin/students");
       return "";
     }
 

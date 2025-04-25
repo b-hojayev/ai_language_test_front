@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +33,9 @@ import { createGroup } from "@/actions/admin/groups/createGroup";
 import { deleteGroup } from "@/actions/admin/groups/deleteGroup";
 import { toast } from "sonner";
 import { updateGroup } from "@/actions/admin/groups/updateGroup";
+import { useInView } from "react-intersection-observer";
+import { getGroups } from "@/actions/admin/groups/getGroups";
+import { useRouter } from "next/navigation";
 
 export interface Group {
   id: string;
@@ -41,15 +44,46 @@ export interface Group {
   group: string;
 }
 
+const FETCH_LIMIT = 25;
+
 export default function GroupList({
-  groups,
+  initialGroups,
   specialities,
 }: {
-  groups: Group[];
+  initialGroups: Group[];
   specialities: Speciality[];
 }) {
+  const router = useRouter();
+
+  const { ref, inView } = useInView();
+  const page = useRef<number>(1);
+  const [isLastPage, setIsLastPage] = useState<boolean>(false);
+
+  const [groups, setGroups] = useState<Group[]>(initialGroups);
   const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
   const [currentGroup, setCurrentGroup] = useState<any | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (inView && !isLastPage) {
+      page.current += 1;
+      fetchGroup(page.current);
+    }
+  }, [inView]);
+
+  const fetchGroup = async (page: number) => {
+    const response = await getGroups(page);
+
+    if (response.error) {
+      setError(response.error);
+    } else {
+      if (response.length < FETCH_LIMIT) {
+        setIsLastPage(true);
+      }
+
+      setGroups((prev) => [...prev, ...response]);
+    }
+  };
 
   const handleDelete = async (groupId: string) => {
     const isError = await deleteGroup(groupId);
@@ -59,8 +93,14 @@ export default function GroupList({
         description: isError,
         closeButton: true,
       });
+    } else {
+      setGroups((prev) => {
+        return prev.filter((value) => value.id !== groupId);
+      });
     }
   };
+
+  console.log(groups);
 
   return (
     <div className="p-4">
@@ -132,11 +172,21 @@ export default function GroupList({
         </TableBody>
       </Table>
 
+      {!isLastPage && (
+        <div ref={ref} className="w-full flex items-center justify-center mt-5">
+          <div className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
       {isDialogOpen && (
         <GroupForm
           specialities={specialities}
           group={currentGroup}
           onClose={() => setDialogOpen(false)}
+          updateGroupList={() => {
+            // router.refresh();
+            window.location.href = "/admin/groups";
+          }}
         />
       )}
     </div>
@@ -147,10 +197,12 @@ function GroupForm({
   group,
   onClose,
   specialities,
+  updateGroupList,
 }: {
   group: any;
   onClose: () => void;
   specialities: Speciality[];
+  updateGroupList: () => void;
 }) {
   const [form, setForm] = useState({
     group_number: "",
@@ -178,6 +230,7 @@ function GroupForm({
       if (isError) {
         setError(isError);
       } else {
+        updateGroupList();
         onClose();
       }
     }

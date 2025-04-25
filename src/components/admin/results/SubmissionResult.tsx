@@ -1,5 +1,9 @@
 "use client";
 
+import { deleteResult } from "@/actions/admin/results/deleteResult";
+import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 type Answer = {
   questionId: string;
   question: string;
@@ -33,6 +37,8 @@ type Props = {
 
 export default function SubmissionResult({ result }: { result: Props }) {
   const { student, answers, submittedAt, test } = result.submission;
+  const { submissionId } = useParams<{ submissionId: string }>();
+  const router = useRouter();
 
   const formatTimer = (ms: string) => {
     const total = parseInt(ms);
@@ -44,9 +50,30 @@ export default function SubmissionResult({ result }: { result: Props }) {
     return new Date(isoDate).toLocaleString();
   };
 
+  const handleDeleteResult = async () => {
+    const isError = await deleteResult(submissionId);
+
+    if (isError) {
+      toast.error("Error", {
+        description: isError,
+        closeButton: true,
+      });
+    } else {
+      router.push("/admin/results");
+    }
+  };
+
   return (
     <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Test Submission</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold mb-4">Test Submission</h1>
+        <button
+          onClick={handleDeleteResult}
+          className="p-2 bg-red-500 rounded-md text-white cursor-pointer hover:bg-red-400"
+        >
+          Delete
+        </button>
+      </div>
 
       <section className="bg-white shadow rounded p-4 mb-6">
         <p>

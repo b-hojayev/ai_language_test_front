@@ -37,7 +37,7 @@ export const createGroup = async (form: {
     });
 
     if (response.ok) {
-      revalidatePath("/admin/groups");
+      revalidatePath("/admin/groups?page=1");
       return "";
     }
 

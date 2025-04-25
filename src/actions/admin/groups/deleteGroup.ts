@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 export const deleteGroup = async (groupId: string) => {
@@ -18,7 +18,8 @@ export const deleteGroup = async (groupId: string) => {
     });
 
     if (response.ok) {
-      revalidatePath("/admin/groups");
+      // revalidatePath("/admin/groups?page=1", "layout");
+      // revalidateTag("groups");
       return "";
     }
 

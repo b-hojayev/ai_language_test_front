@@ -20,7 +20,7 @@ const publicRoutes = ["/login"];
 export const middleware = async (req: NextRequest) => {
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
+  // const isPublicRoute = publicRoutes.includes(path);
 
   const token = (await cookies()).get("token")?.value;
   const role = (await cookies()).get("role")?.value;

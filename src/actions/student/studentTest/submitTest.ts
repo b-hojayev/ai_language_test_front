@@ -1,7 +1,6 @@
 "use server";
 
 import { CompletedQuestionType } from "@/components/student/StudentTest";
-import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 export const submitTest = async (

@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ReactNode } from "react";
 
 const StudentLayout = ({ children }: { children: ReactNode }) => {

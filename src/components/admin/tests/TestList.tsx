@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
@@ -63,45 +62,45 @@ interface PreviewType {
   }[];
 }
 
-const previewEx = {
-  fillQuestions: [
-    {
-      id: 1,
-      question:
-        "In the story, the main character _____ at the beginning of the journey.",
-      correctAnswer: "starts",
-    },
-  ],
-  tests: [
-    {
-      id: 1,
-      question:
-        "What is the correct form of the verb to use after 'have'? 'Have______ and not have?'",
-      answerVariants: [
-        {
-          id: 1,
-          answer: "some",
-          isCorrect: true,
-        },
-        {
-          id: 2,
-          answer: "any",
-          isCorrect: false,
-        },
-        {
-          id: 3,
-          answer: "none",
-          isCorrect: false,
-        },
-        {
-          id: 4,
-          answer: "all",
-          isCorrect: false,
-        },
-      ],
-    },
-  ],
-};
+// const previewEx = {
+//   fillQuestions: [
+//     {
+//       id: 1,
+//       question:
+//         "In the story, the main character _____ at the beginning of the journey.",
+//       correctAnswer: "starts",
+//     },
+//   ],
+//   tests: [
+//     {
+//       id: 1,
+//       question:
+//         "What is the correct form of the verb to use after 'have'? 'Have______ and not have?'",
+//       answerVariants: [
+//         {
+//           id: 1,
+//           answer: "some",
+//           isCorrect: true,
+//         },
+//         {
+//           id: 2,
+//           answer: "any",
+//           isCorrect: false,
+//         },
+//         {
+//           id: 3,
+//           answer: "none",
+//           isCorrect: false,
+//         },
+//         {
+//           id: 4,
+//           answer: "all",
+//           isCorrect: false,
+//         },
+//       ],
+//     },
+//   ],
+// };
 
 const initialPrompt = {
   prompt: "",
