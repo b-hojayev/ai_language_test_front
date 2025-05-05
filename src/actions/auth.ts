@@ -1,4 +1,5 @@
 "use server";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies } from "next/headers";
@@ -11,8 +12,11 @@ export const login = async (prevStata: any, formData: FormData) => {
     name: formData.get("name"),
     password: formData.get("password"),
   };
+  console.log(rawFormData);
 
   const url = `${process.env.NEXT_PUBLIC_API_HOST}/auth/login`;
+  console.log(url);
+
   const fetchParams = {
     method: "POST",
     body: JSON.stringify(rawFormData),
@@ -23,6 +27,8 @@ export const login = async (prevStata: any, formData: FormData) => {
 
   try {
     const response = await fetch(url, fetchParams);
+    console.log(response);
+
     const data = await response.json();
     console.log(data);
 
@@ -47,6 +53,8 @@ export const login = async (prevStata: any, formData: FormData) => {
       redirectPath = "/student";
     }
   } catch (error: any) {
+    console.log(error);
+
     return { message: error.message };
   }
 
